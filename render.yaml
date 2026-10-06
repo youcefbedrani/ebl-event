@@ -3,3 +3,37 @@ services:
     name: ebl-screen
     buildCommand: npm run build
     staticPublishPath: dist
+
+  # Reverse proxies for the two sites that send X-Frame-Options: SAMEORIGIN,
+  # so they can be shown inside the kiosk's built-in web view.
+  - type: web
+    name: ebl-proxy-purevia
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://purevia.ebl-offecial.com
+      - key: EBL_USER
+        value: admin@purevia.ebl-offecial.com
+      - key: EBL_PASS
+        value: ebl20252026
+
+  - type: web
+    name: ebl-proxy-oxiom
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://oxiom.ebl-offecial.com
+      - key: EBL_USER
+        value: admin
+      - key: EBL_PASS
+        value: ebl20252026

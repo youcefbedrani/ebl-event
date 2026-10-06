@@ -1,4 +1,14 @@
+/*
+ * Generated from original/index.html by gen-data.mjs — do not edit by hand.
+ * PROXY holds the reverse proxies (render.yaml) used for the two sites that
+ * refuse to be embedded; every site opens inside the built-in viewer.
+ */
 export const OPEN_IN = "frame";
+
+export const PROXY = {
+  "purevia": "https://ebl-proxy-purevia.onrender.com",
+  "oxiom": "https://ebl-proxy-oxiom.onrender.com"
+};
 
 export const SOLUTIONS = [
   {
@@ -34,13 +44,14 @@ export const SITES = [
     "id": "purevia",
     "name": "Purevia",
     "host": "purevia.ebl-offecial.com",
-    "client": "https://purevia.ebl-offecial.com/",
-    "admin": "https://purevia.ebl-offecial.com/admin/login",
+    "client": "https://ebl-proxy-purevia.onrender.com/",
+    "admin": "https://ebl-proxy-purevia.onrender.com/admin/login",
     "cred": {
       "user": "admin@purevia.ebl-offecial.com",
       "pass": "ebl20252026"
     },
-    "embed": false
+    "embed": true,
+    "proxied": true
   },
   {
     "id": "smoothy",
@@ -82,12 +93,13 @@ export const SITES = [
     "id": "oxiom",
     "name": "Oxiom",
     "host": "oxiom.ebl-offecial.com",
-    "client": "https://oxiom.ebl-offecial.com/",
-    "admin": "https://oxiom.ebl-offecial.com/admin/login",
+    "client": "https://ebl-proxy-oxiom.onrender.com/",
+    "admin": "https://ebl-proxy-oxiom.onrender.com/admin/login",
     "cred": {
       "user": "admin",
       "pass": "ebl20252026"
     },
-    "embed": false
+    "embed": true,
+    "proxied": true
   }
 ];

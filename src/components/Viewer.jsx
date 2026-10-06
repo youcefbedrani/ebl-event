@@ -25,6 +25,10 @@ export default function Viewer({ viewer, onClose }) {
   const hasCred = !!urls.cred;
   const hasBoth = !!(urls.client && urls.admin);
 
+  /* #ebl-autologin makes the proxied admin pages fill + submit the login form */
+  const withFlag = (u) =>
+    mode === 'admin' && urls.cred && u && u.indexOf('#') < 0 ? u + '#ebl-autologin' : u;
+
   useEffect(() => {
     if (!src) {
       setFrame(BLANK);
@@ -33,8 +37,8 @@ export default function Viewer({ viewer, onClose }) {
     }
     nonce.current += 1;
     setLoading(true);
-    setFrame({ src, nonce: nonce.current });
-  }, [src]);
+    setFrame({ src: withFlag(src), nonce: nonce.current });
+  }, [src, mode]);
 
   useEffect(() => {
     if (!viewer) return;
@@ -74,11 +78,7 @@ export default function Viewer({ viewer, onClose }) {
   const title = viewer
     ? viewer.title + (hasBoth ? ' · ' + t(isAdmin ? 'btn_admin' : 'btn_client') : '')
     : '';
-  const external = src
-    ? isAdmin && src.indexOf('#') < 0
-      ? src + '#ebl-autologin'
-      : src
-    : '';
+  const external = withFlag(src) || '';
 
   const creds = isAdmin && hasCred ? (
     <div className="vcreds">
@@ -132,7 +132,7 @@ export default function Viewer({ viewer, onClose }) {
           onClick={() => {
             nonce.current += 1;
             setLoading(true);
-            setFrame({ src, nonce: nonce.current });
+            setFrame({ src: withFlag(src), nonce: nonce.current });
           }}
         >
           {t('v_reload')}
