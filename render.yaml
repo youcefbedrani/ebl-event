@@ -1,0 +1,5 @@
+services:
+  - type: static
+    name: ebl-screen
+    buildCommand: npm run build
+    staticPublishPath: dist

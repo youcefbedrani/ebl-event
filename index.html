@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <script>
+    (function(){
+      var mode = 'dark';
+      try { mode = localStorage.getItem('ebl-theme') || 'dark'; } catch(e){}
+      document.documentElement.className = mode;
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>E-BUSINESS LAB | Solutions</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

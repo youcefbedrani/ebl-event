@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "EBL Kiosk Auto Login",
+  "version": "1.0",
+  "description": "Signs in to the E-BUSINESS LAB demo admin panels when opened from the kiosk board.",
+  "content_scripts": [
+    {
+      "matches": ["https://*.ebl-offecial.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

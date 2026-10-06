@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.local
+.dom-out
+.dom-entry.jsx
+vite.dom.config.js
