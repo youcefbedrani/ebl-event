@@ -128,14 +128,28 @@ function inject(html, path) {
 
 async function proxy(req, res) {
   const url = new URL(req.url, 'http://localhost');
+  const CORS = {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, OPTIONS',
+    'access-control-allow-headers': '*'
+  };
 
+  if (req.method === 'OPTIONS' && url.pathname.startsWith('/__ebl/')) {
+    res.writeHead(204, CORS);
+    res.end();
+    return;
+  }
   if (url.pathname === '/__ebl/boot.js') {
-    res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'public, max-age=3600' });
+    res.writeHead(200, {
+      ...CORS,
+      'content-type': 'text/javascript; charset=utf-8',
+      'cache-control': 'public, max-age=3600'
+    });
     res.end(BOOT_JS);
     return;
   }
   if (url.pathname === '/__ebl/health') {
-    res.writeHead(200, { 'content-type': 'application/json' });
+    res.writeHead(200, { ...CORS, 'content-type': 'application/json' });
     res.end(JSON.stringify({ ok: true, target: ORIGIN }));
     return;
   }

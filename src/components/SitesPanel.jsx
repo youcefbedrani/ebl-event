@@ -1,6 +1,16 @@
 import { SITES } from '../data.js';
 import { useLang } from '../lang.jsx';
 
+const pack = (s) => ({
+  client: s.client,
+  admin: s.admin,
+  cred: s.cred,
+  embed: s.embed,
+  proxied: s.proxied,
+  proxy: s.proxy,
+  real: s.real
+});
+
 export default function SitesPanel({ active, onOpenViewer }) {
   const { t } = useLang();
 
@@ -23,7 +33,7 @@ export default function SitesPanel({ active, onOpenViewer }) {
                 onClick={() =>
                   onOpenViewer(
                     s.name,
-                    { client: s.client, admin: s.admin, cred: s.cred, embed: s.embed },
+                    pack(s),
                     'client'
                   )
                 }
@@ -36,7 +46,7 @@ export default function SitesPanel({ active, onOpenViewer }) {
                 onClick={() =>
                   onOpenViewer(
                     s.name,
-                    { client: s.client, admin: s.admin, cred: s.cred, embed: s.embed },
+                    pack(s),
                     'admin'
                   )
                 }

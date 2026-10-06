@@ -28,7 +28,7 @@ export default function SolutionsPanel({ active, onOpenViewer }) {
                   type="button"
                   className="btn btn-fill"
                   onClick={() =>
-                    onOpenViewer(s.name, { client: s.url, embed: s.demo ? s.demo.embed : true }, 'client')
+                    onOpenViewer(s.name, { client: s.url, embed: s.demo ? s.demo.embed : true, proxied: s.proxied, proxy: s.proxy, real: s.real && { client: s.real.client } }, 'client')
                   }
                 >
                   {t('btn_visit')}
@@ -41,7 +41,7 @@ export default function SolutionsPanel({ active, onOpenViewer }) {
                   onClick={() =>
                     onOpenViewer(
                       s.name,
-                      { admin: s.demo.admin, cred: s.demo.cred, embed: s.demo.embed },
+                      { admin: s.demo.admin, cred: s.demo.cred, embed: s.demo.embed, proxied: s.proxied, proxy: s.proxy, real: s.real && { admin: s.real.admin } },
                       'admin'
                     )
                   }

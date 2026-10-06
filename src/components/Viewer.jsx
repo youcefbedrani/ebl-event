@@ -3,6 +3,11 @@ import { useLang } from '../lang.jsx';
 
 const BLANK = { src: 'about:blank', nonce: 0 };
 
+/* A sleeping Render service answers 5xx for up to ~50 s while it wakes up. */
+const HEALTH_ATTEMPTS = 10;
+const HEALTH_RETRY = 5000;
+const HEALTH_TIMEOUT = 10000;
+
 export default function Viewer({ viewer, onClose }) {
   const { t } = useLang();
   const [override, setOverride] = useState(null);
@@ -10,11 +15,13 @@ export default function Viewer({ viewer, onClose }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(null);
   const [frame, setFrame] = useState(BLANK);
+  const [health, setHealth] = useState('unknown');
   const nonce = useRef(0);
 
   if (viewer !== prevViewer) {
     setPrevViewer(viewer);
     setOverride(null);
+    setHealth('checking');
   }
 
   const urls = viewer ? viewer.urls : {};
@@ -25,9 +32,53 @@ export default function Viewer({ viewer, onClose }) {
   const hasCred = !!urls.cred;
   const hasBoth = !!(urls.client && urls.admin);
 
+  /* The proxy serves /__ebl/health with CORS, so a missing service can be
+     spotted before the iframe shows a 404 — then the site opens in a tab. */
+  const proxied = !!urls.proxied;
+  const offline = proxied && health === 'fail';
+  const blocked = !embed || offline;
+
   /* #ebl-autologin makes the proxied admin pages fill + submit the login form */
   const withFlag = (u) =>
     mode === 'admin' && urls.cred && u && u.indexOf('#') < 0 ? u + '#ebl-autologin' : u;
+
+  useEffect(() => {
+    if (!viewer || !proxied) {
+      setHealth(proxied ? 'checking' : 'unknown');
+      return undefined;
+    }
+    let cancelled = false;
+    let timer = null;
+    let attempt = 0;
+    let ctl = null;
+    setHealth('checking');
+
+    const check = () => {
+      attempt += 1;
+      ctl = new AbortController();
+      const tick = setTimeout(() => ctl.abort(), HEALTH_TIMEOUT);
+      fetch(urls.proxy + '/__ebl/health', { signal: ctl.signal, cache: 'no-store' })
+        .then((r) => {
+          if (cancelled) return;
+          if (r.ok) setHealth('ok');
+          else if (r.status >= 500 && attempt < HEALTH_ATTEMPTS) timer = setTimeout(check, HEALTH_RETRY);
+          else setHealth('fail');
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (attempt < HEALTH_ATTEMPTS) timer = setTimeout(check, HEALTH_RETRY);
+          else setHealth('fail');
+        })
+        .finally(() => clearTimeout(tick));
+    };
+    check();
+
+    return () => {
+      cancelled = true;
+      if (ctl) ctl.abort();
+      if (timer) clearTimeout(timer);
+    };
+  }, [viewer, proxied, urls.proxy]);
 
   useEffect(() => {
     if (!src) {
@@ -78,7 +129,9 @@ export default function Viewer({ viewer, onClose }) {
   const title = viewer
     ? viewer.title + (hasBoth ? ' · ' + t(isAdmin ? 'btn_admin' : 'btn_client') : '')
     : '';
-  const external = withFlag(src) || '';
+  /* When the proxy is down, the new tab goes to the real site instead. */
+  const real = urls.real && (urls.real[mode] || urls.real.client);
+  const external = (offline && real ? real : withFlag(src)) || '';
 
   const creds = isAdmin && hasCred ? (
     <div className="vcreds">
@@ -112,7 +165,7 @@ export default function Viewer({ viewer, onClose }) {
         <button
           type="button"
           className="btn btn-ghost"
-          style={{ display: embed && isAdmin && hasCred ? '' : 'none' }}
+          style={{ display: !blocked && isAdmin && hasCred ? '' : 'none' }}
           onClick={() => copy(urls.cred.user, 'user')}
         >
           {copied === 'user' ? t('v_copied') : t('v_user')}
@@ -120,7 +173,7 @@ export default function Viewer({ viewer, onClose }) {
         <button
           type="button"
           className="btn btn-ghost"
-          style={{ display: embed && isAdmin && hasCred ? '' : 'none' }}
+          style={{ display: !blocked && isAdmin && hasCred ? '' : 'none' }}
           onClick={() => copy(urls.cred.pass, 'pass')}
         >
           {copied === 'pass' ? t('v_copied') : t('v_pass')}
@@ -128,7 +181,7 @@ export default function Viewer({ viewer, onClose }) {
         <button
           type="button"
           className="btn btn-ghost"
-          style={{ display: embed && src ? '' : 'none' }}
+          style={{ display: !blocked && src ? '' : 'none' }}
           onClick={() => {
             nonce.current += 1;
             setLoading(true);
@@ -147,7 +200,7 @@ export default function Viewer({ viewer, onClose }) {
         <p className="vhint">{t('v_hint')}</p>
       </div>
       <div className="vbody">
-        {!viewer ? null : embed ? (
+        {!viewer ? null : !blocked ? (
           <>
             <div className={'vload' + (loading ? '' : ' done')}>
               <div className="spin" />
@@ -163,8 +216,8 @@ export default function Viewer({ viewer, onClose }) {
           </>
         ) : (
           <div className="vblocked">
-            <h3>{t('v_blocked_t')}</h3>
-            <p>{t('v_blocked')}</p>
+            <h3>{t(offline ? 'v_offline_t' : 'v_blocked_t')}</h3>
+            <p>{t(offline ? 'v_offline' : 'v_blocked')}</p>
             {creds}
             <div className="acts">
               <button

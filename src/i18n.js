@@ -66,7 +66,9 @@ export const T = {
     "err_net": "Connexion impossible, veuillez réessayer.",
     "v_blocked_t": "Ce site bloque son affichage intégré",
     "v_blocked": "Le site refuse d'être chargé dans une page (X-Frame-Options). Ouvrez-le dans un nouvel onglet, puis connectez-vous avec les identifiants ci-dessous.",
-    "v_creds": "Identifiants de démonstration"
+    "v_creds": "Identifiants de démonstration",
+    "v_offline_t": "La page intégrée ne répond pas",
+    "v_offline": "Le service d'affichage de ce site est injoignable (service arrêté, en cours de démarrage ou mal nommé). Ouvrez-le dans un nouvel onglet avec les identifiants ci-dessous."
   },
   "en": {
     "tagline": "Ideas built to become solutions",
@@ -133,8 +135,10 @@ export const T = {
     "ok": "Thank you! We will contact you very soon.",
     "err_send": "Something went wrong, please try again.",
     "err_net": "Connection failed, please try again.",
+    "v_creds": "Demo credentials",
+    "v_offline_t": "The embedded page is not responding",
+    "v_offline": "This site's viewing service is unreachable (asleep, starting up or misnamed). Open it in a new tab with the credentials below.",
     "v_blocked_t": "This site blocks embedding",
-    "v_blocked": "The site refuses to be loaded inside a page (X-Frame-Options). Open it in a new tab, then sign in with the credentials below.",
-    "v_creds": "Demo credentials"
+    "v_blocked": "The site refuses to be loaded inside a page (X-Frame-Options). Open it in a new tab, then sign in with the credentials below."
   }
 };

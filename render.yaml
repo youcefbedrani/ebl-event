@@ -4,8 +4,9 @@ services:
     buildCommand: npm run build
     staticPublishPath: dist
 
-  # Reverse proxies for the two sites that send X-Frame-Options: SAMEORIGIN,
-  # so they can be shown inside the kiosk's built-in web view.
+  # One reverse proxy per site (proxy/server.mjs): lets every website open inside
+  # the kiosk's built-in web view and fills in the admin sign-in automatically.
+  # The base URLs must stay in sync with PROXY in src/data.js.
   - type: web
     name: ebl-proxy-purevia
     runtime: node
@@ -23,6 +24,54 @@ services:
         value: ebl20252026
 
   - type: web
+    name: ebl-proxy-smoothy
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://smoothy.ebl-offecial.com
+      - key: EBL_USER
+        value: admin
+      - key: EBL_PASS
+        value: ebl20252026
+
+  - type: web
+    name: ebl-proxy-swanson
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://swanson.ebl-offecial.com
+      - key: EBL_USER
+        value: admin
+      - key: EBL_PASS
+        value: ebl20252026
+
+  - type: web
+    name: ebl-proxy-steps
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://steps.ebl-offecial.com
+      - key: EBL_USER
+        value: admin
+      - key: EBL_PASS
+        value: ebl20252026
+
+  - type: web
     name: ebl-proxy-oxiom
     runtime: node
     rootDir: proxy
@@ -35,5 +84,21 @@ services:
         value: https://oxiom.ebl-offecial.com
       - key: EBL_USER
         value: admin
+      - key: EBL_PASS
+        value: ebl20252026
+
+  - type: web
+    name: ebl-proxy-managup
+    runtime: node
+    rootDir: proxy
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /__ebl/health
+    envVars:
+      - key: TARGET
+        value: https://managup.ebl-offecial.com
+      - key: EBL_USER
+        value: admin@mini-erp.local
       - key: EBL_PASS
         value: ebl20252026
