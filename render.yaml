@@ -1,8 +1,9 @@
 services:
-  - type: static
+  - type: web
     name: ebl-screen
+    runtime: static
     buildCommand: npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
 
   # One reverse proxy per site (proxy/server.mjs): lets every website open inside
   # the kiosk's built-in web view and fills in the admin sign-in automatically.
